@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>セットアップ手順 | PTA入会申込・会員名簿管理ツール</title>
+  <style>
+    :root { --ink:#172536; --muted:#59697a; --line:#d8e0e8; --blue:#0f4c81; --bg:#f6f8fb; --note:#fffdf4; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.9; }
+    header { background:var(--blue); color:#fff; padding:28px 18px; }
+    header .inner, main, footer { max-width:920px; margin:0 auto; }
+    h1 { margin:0; font-size:1.55rem; line-height:1.5; }
+    h2 { margin:42px 0 14px; padding-left:12px; border-left:5px solid var(--blue); font-size:1.28rem; }
+    h3 { margin:26px 0 8px; font-size:1.08rem; }
+    main { background:#fff; padding:34px 30px 52px; border-left:1px solid var(--line); border-right:1px solid var(--line); }
+    p { margin:0 0 1em; }
+    .lead { font-size:1.05rem; }
+    .note { background:var(--note); border:1px solid #eadfbb; border-left:5px solid #c49a24; padding:16px 18px; margin:24px 0; }
+    code, pre { font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace; }
+    pre { white-space:pre-wrap; background:#f1f4f7; border:1px solid var(--line); padding:14px 16px; overflow:auto; }
+    table { border-collapse:collapse; width:100%; margin:16px 0 24px; }
+    th, td { border:1px solid var(--line); padding:10px 12px; vertical-align:top; }
+    th { background:#edf3f8; text-align:left; }
+    a { color:#0f4c81; }
+    footer { padding:24px 18px 42px; color:var(--muted); font-size:.92rem; }
+  </style>
+</head>
+<body>
+<header><div class="inner"><h1>セットアップ手順<br>PTA入会申込・会員名簿管理ツール</h1></div></header>
+<main>
+  <p class="lead">このツールは、GoogleフォームとGoogleスプレッドシートを使って、PTA自身が入会申込、重要事項への同意、会費の入金確認、会員名簿を管理するためのものです。</p>
+  <div class="note">GitHub上でファイルを見ているだけでは動きません。実行場所はGoogleスプレッドシートです。<code>src/Code.gs</code> を、フォーム回答先スプレッドシートの Apps Script に貼り付けて使います。</div>
+
+  <h2>1. PTA専用のGoogleアカウントを用意する</h2>
+  <p>個人アカウントではなく、PTA用の共有Googleアカウントを使うことを推奨します。役員交代時に引き継ぎやすく、個人のGoogleドライブに名簿が残ることを避けやすくなります。</p>
+
+  <h2>2. Googleフォームを作る</h2>
+  <p>最低限、次の質問を作ります。質問文は、Apps Script側の <code>FIELD_MAP</code> と一致させる必要があります。</p>
+  <pre>保護者氏名
+児童・生徒氏名
+学年・組
+メールアドレス
+加入意思の確認
+重要事項に同意します</pre>
+  <table>
+    <thead><tr><th>質問</th><th>形式</th><th>必須</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>保護者氏名</td><td>記述式</td><td>必須</td><td>申込者本人の氏名</td></tr>
+      <tr><td>児童・生徒氏名</td><td>記述式</td><td>任意または必須</td><td>PTAの運用に応じて判断</td></tr>
+      <tr><td>学年・組</td><td>記述式</td><td>任意または必須</td><td>年度更新時に見直す</td></tr>
+      <tr><td>メールアドレス</td><td>記述式</td><td>必須</td><td>受付・連絡用</td></tr>
+      <tr><td>加入意思の確認</td><td>ラジオボタン</td><td>必須</td><td>「PTAへの加入を申し込みます」など</td></tr>
+      <tr><td>重要事項に同意します</td><td>チェックボックス</td><td>必須</td><td>説明文を読んだ確認</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. 回答先スプレッドシートを作る</h2>
+  <p>Googleフォーム編集画面で「回答」タブを開き、スプレッドシートのアイコンから回答先を作成します。このスプレッドシートが申込管理台帳になります。</p>
+
+  <h2>4. Apps Scriptへコードを貼る</h2>
+  <p>回答先スプレッドシートを開き、<strong>拡張機能 → Apps Script</strong> を開きます。既定で入っているコードを削除し、<code>src/Code.gs</code> の全文を貼り付けて保存します。</p>
+
+  <h2>5. CONFIGを編集する</h2>
+  <p><code>Code.gs</code> 冒頭の <code>CONFIG</code> を自分のPTAに合わせます。</p>
+  <pre>const CONFIG = {
+  ORG_NAME: 'サンプルPTA',
+  CONTACT_EMAIL: 'pta@example.com',
+  CONSENT_VERSION: '2026-06',
+  ROSTER_SHEET: '申込・名簿',
+  MEMBER_SHEET: '会員名簿',
+  EMAIL_ENABLED: false,
+  PAYMENT_GUIDE_TEXT: '会費のお支払い方法は、別途配布済みの案内をご確認ください。',
+  APPLY_VALUE: 'PTAへの加入を申し込みます',
+};</pre>
+  <p>メール送信は初期状態で無効です。テスト完了後に使う場合だけ <code>EMAIL_ENABLED: true</code> に変更してください。</p>
+
+  <h2>6. FIELD_MAPを確認する</h2>
+  <p><code>FIELD_MAP</code> の右側は、Googleフォームの質問文と一字一句一致させてください。ここがずれると、申込者名、メールアドレス、同意記録が名簿に転記されません。</p>
+  <pre>const FIELD_MAP = {
+  guardianName: '保護者氏名',
+  childName: '児童・生徒氏名',
+  gradeClass: '学年・組',
+  email: 'メールアドレス',
+  joinIntent: '加入意思の確認',
+  consent: '重要事項に同意します',
+};</pre>
+
+  <h2>7. setupPtaToolを実行する</h2>
+  <p>Apps Script画面上部の関数選択で <code>setupPtaTool</code> を選び、実行します。初回はGoogleの承認画面が出ます。承認後、スプレッドシートに「申込・名簿」「会員名簿」「使い方」が作成されます。</p>
+
+  <h2>8. onFormSubmitトリガーを設定する</h2>
+  <p>Apps Script左側の「トリガー」から、次のトリガーを追加します。</p>
+  <pre>実行する関数: onFormSubmit
+イベントのソース: スプレッドシートから
+イベントの種類: フォーム送信時</pre>
+  <p>この設定をしないと、フォーム送信時に「申込・名簿」へ転記されません。</p>
+
+  <h2>9. テスト送信する</h2>
+  <p>Googleフォームからテスト送信します。「申込・名簿」に受付番号、状態、同意文の版が記録されれば成功です。</p>
+
+  <h2>10. 入金確認後に会員確定する</h2>
+  <p>会計担当者が現金や振込を確認したら、「申込・名簿」シートで対象行を選択し、<strong>PTA入会管理 → 選択した行を会員として確定（入金確認）</strong> を実行します。</p>
+
+  <h2>11. 会員名簿を書き出す</h2>
+  <p><strong>PTA入会管理 → 会員名簿を書き出す（入金確認済のみ）</strong> を実行すると、「会員名簿」シートには入金確認済みの人だけが出力されます。</p>
+
+  <h2>12. 取下げ・誤送信・重複を処理する</h2>
+  <p>対象行を選び、<strong>PTA入会管理 → 選択した行を取下げ／無効にする</strong> を実行します。この状態の行は、会員名簿には出ません。</p>
+
+  <h2>注意点</h2>
+  <p>このツールは、学校が保有する児童・保護者名簿をPTAへ流用する前提ではありません。PTA自身がフォームで取得した情報だけを使う設計にしてください。</p>
+</main>
+<footer>PTA適正化推進委員会 / MIT License</footer>
+</body>
+</html>
