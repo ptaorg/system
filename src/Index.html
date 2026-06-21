@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><base target="_top"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PTA管理アプリ</title>
+<style>body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;line-height:1.7;background:#f4f8fb;color:#1f2d38;margin:0}.wrap{max-width:1000px;margin:auto;padding:16px}.hero{background:#123047;color:white;border-radius:18px;padding:20px}.box{background:white;border:1px solid #d7e3ea;border-radius:14px;padding:14px;margin:12px 0}button{border:0;border-radius:999px;padding:8px 12px;font-weight:bold;background:#0f766e;color:white;cursor:pointer}.danger{background:#b42318}.muted{color:#667684}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #d7e3ea;padding:8px;text-align:left}th{background:#eef5f9}</style>
+</head>
+<body><div class="wrap"><div class="hero"><h1>PTA管理アプリ</h1><p>申込一覧、会員確定、会員名簿を表示します。</p></div><div id="view" class="box">読み込み中...</div></div>
+<script>
+let data={applications:[],members:[],dashboard:{}};
+function load(){google.script.run.withSuccessHandler(function(res){data=res;render();}).withFailureHandler(function(err){document.getElementById('view').textContent=err.message||String(err);}).admin_getInitialData();}
+function render(){let d=data.dashboard||{};let html='<h2>ダッシュボード</h2><p>申込総数: '+(d.totalApplications||0)+' / 未確定: '+(d.pendingApplications||0)+' / 会員確定: '+(d.confirmedApplications||0)+'</p>';html+='<h2>申込一覧</h2><table><tr><th>申込ID</th><th>保護者</th><th>メール</th><th>状態</th><th>操作</th></tr>';(data.applications||[]).forEach(function(r){html+='<tr><td>'+esc(r.id)+'</td><td>'+esc(r.guardian)+'</td><td>'+esc(r.email)+'</td><td>'+esc(r.status)+'</td><td><button data-row="'+r.rowNumber+'" class="confirm">会員確定</button> <button data-row="'+r.rowNumber+'" class="danger withdraw">取下げ</button></td></tr>';});html+='</table><h2>会員名簿</h2><table><tr><th>会員ID</th><th>保護者</th><th>メール</th></tr>';(data.members||[]).forEach(function(r){html+='<tr><td>'+esc(r.id)+'</td><td>'+esc(r.guardian)+'</td><td>'+esc(r.email)+'</td></tr>';});html+='</table>';document.getElementById('view').innerHTML=html;document.querySelectorAll('.confirm').forEach(function(b){b.addEventListener('click',function(){confirmMember(this.dataset.row);});});document.querySelectorAll('.withdraw').forEach(function(b){b.addEventListener('click',function(){withdrawMember(this.dataset.row);});});}
+function confirmMember(row){if(!window.confirm('会員確定しますか。'))return;google.script.run.withSuccessHandler(load).withFailureHandler(alertError).admin_confirmMember(Number(row));}
+function withdrawMember(row){if(!window.confirm('取下げ／無効にしますか。'))return;google.script.run.withSuccessHandler(load).withFailureHandler(alertError).admin_withdrawApplication(Number(row),'管理アプリから取下げ');}
+function alertError(err){window.alert(err.message||String(err));}
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+load();
+</script></body></html>
