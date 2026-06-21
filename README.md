@@ -1,78 +1,49 @@
 # PTAホームページ・入会申込・管理アプリ
 
-PTAの任意加入、明示申込、学校名簿非流用を前提に、保護者用Googleサイト、入会申込Googleフォーム、役員用管理アプリをまとめて使うための配布用セットです。
+このリポジトリは開発・保管用です。
+実際に各PTAへ案内する主役は、GitHubではなく、Googleサイト原本と役員用管理アプリ原本です。
 
-## まず渡すURL
+## 配布の考え方
 
-https://github.com/ptaorg/system
-
-## このセットの完成形
+各PTAに渡すものは、次の2つです。
 
 ```text
-保護者
-↓
-Googleサイト
-↓
-入会申込Googleフォーム
-↓
-管理スプレッドシート
-↓
-役員用管理アプリ
+1. 保護者用Googleサイト原本
+2. 役員用管理アプリ原本
 ```
 
-保護者に見せるのは、Googleサイトと入会申込フォームだけです。
-管理アプリURL、管理スプレッドシートURL、編集用フォームURLは保護者へ共有しません。
+各PTAは、それぞれをコピーして使います。
+GitHub上のコードを読ませる運用にはしません。
 
-## Googleサイトはそのまま使える形にする
+## 保護者用Googleサイト原本
 
-まず使うファイルはこれです。
-
-```text
-site/google-site-ready.html
-```
-
-この1ファイルに、次の内容をまとめています。
+Googleサイトの原本をコピーして使う形にします。
+コピー後、各PTAが差し替えるのは次の部分だけです。
 
 ```text
-トップページ
-お知らせ
-活動紹介
-資料室
-入会案内
-重要事項
-FAQ
-お問い合わせ
-```
-
-Googleサイトでページを作り、`挿入 → 埋め込む → 埋め込みコード` に全文を貼れば使えます。
-
-各PTAは、次の部分だけ差し替えます。
-
-```text
-○○学校PTA
+PTA名
+学校名
 年度
 会費
 支払い方法
 問い合わせ先メール
-FORM_URL_HERE
-PDF資料リンク
+入会申込フォームURL
+資料PDFリンク
 ```
 
-## 管理アプリはアプリとして使う
+## 役員用管理アプリ原本
 
-役員側は、表を直接触るのではなく、Apps Scriptの管理アプリ画面を使います。
-
-使うファイルはこの2つです。
+役員側は、スプレッドシートを直接触るのではなく、管理アプリ画面を入口にします。
 
 ```text
-src/Code.gs
-src/Code.webapp-addon.gs
-src/Index.html
+役員用管理アプリ
+↓
+申込一覧
+↓
+会員確定
+↓
+会員名簿
 ```
-
-`Code.gs` が基本処理、`Code.webapp-addon.gs` が管理アプリ画面との接続、`Index.html` が役員用の画面です。
-
-Apps Scriptに貼った後、Webアプリとしてデプロイすれば、役員用の管理アプリURLができます。
 
 ## 基本原則
 
@@ -82,44 +53,7 @@ Apps Scriptに貼った後、Webアプリとしてデプロイすれば、役員
 - 学校名簿を流用せず、申込者本人が入力した情報だけで会員管理を行います。
 - この仕組みは、非加入者情報を集めるためのものではありません。
 
-## ファイル構成
+## このリポジトリの位置づけ
 
-```text
-/
-├── index.html                       # 配布説明ページ
-├── README.md                        # この説明
-├── site/
-│   └── google-site-ready.html       # Googleサイトへそのまま貼る原本HTML
-├── src/
-│   ├── Code.gs                      # Apps Script本体
-│   ├── Code.webapp-addon.gs         # 管理アプリ画面用の追加コード
-│   ├── Index.html                   # 管理アプリ画面HTML
-│   └── appsscript.json              # Apps Script設定例
-└── docs/
-    ├── GOOGLE_SITE_READY.md         # Googleサイト原本の使い方
-    ├── SETUP.md                     # セットアップ手順
-    ├── form-template.md             # Googleフォーム項目例
-    ├── consent-template.md          # 重要事項説明テンプレート
-    └── operation.md                 # 日常運用手順
-```
-
-## 最短手順
-
-1. `site/google-site-ready.html` をGoogleサイトに埋め込む。
-2. 入会申込Googleフォームを作る。
-3. 管理スプレッドシートを作る。
-4. スプレッドシートのApps Scriptに `src/Code.gs` を貼る。
-5. 同じApps Scriptに `src/Code.webapp-addon.gs` も貼る。
-6. HTMLファイル `Index` を作り、`src/Index.html` を貼る。
-7. フォームURLをGoogleサイトの `FORM_URL_HERE` と差し替える。
-8. Webアプリとしてデプロイする。
-9. テスト申込を送る。
-10. 管理アプリで会員確定できるか確認する。
-
-## やってはいけないこと
-
-- 加入しない方にフォーム提出を求めること。
-- 非加入届として使うこと。
-- 学校名簿をPTA会員名簿として流用すること。
-- 申込のない保護者を会員として登録すること。
-- 管理アプリURLや管理シートURLを保護者全体へ共有すること。
+ここは、原本のHTMLやApps Scriptを保管する場所です。
+利用者向けの導線は、Google DriveまたはGoogleサイトのコピー用URLに集約します。
